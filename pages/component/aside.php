@@ -9,8 +9,8 @@
     <hr class="horizontal dark mt-0">
     <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
         <ul class="navbar-nav">
-            <li class="nav-item" onclick="clickAside('nav-home');">
-                <a class="nav-link nav-home active" href="/">
+            <li class="nav-item">
+                <a class="nav-link nav-home" href="/">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="12px" viewBox="0 0 45 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                             <title>Home</title>
@@ -31,7 +31,7 @@
                     <span class="nav-link-text ms-1">Home</span>
                 </a>
             </li>
-            <li class="nav-item" onclick="clickAside('nav-category');">
+            <li class="nav-item">
                 <a class="nav-link nav-category" href="/category">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -53,7 +53,7 @@
                     <span class="nav-link-text ms-1">Category</span>
                 </a>
             </li>
-            <li class="nav-item" onclick="clickAside('nav-tables');">
+            <li class="nav-item">
                 <a class="nav-link nav-tables" href="/tables">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -75,7 +75,7 @@
                     <span class="nav-link-text ms-1">Tables</span>
                 </a>
             </li>
-            <li class="nav-item" onclick="clickAside('nav-billing');">
+            <li class="nav-item">
                 <a class="nav-link nav-billing" href="/billing">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="12px" viewBox="0 0 43 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -97,7 +97,7 @@
                     <span class="nav-link-text ms-1">Billing</span>
                 </a>
             </li>
-            <li class="nav-item" onclick="clickAside('nav-virtual-reality');">
+            <li class="nav-item">
                 <a class="nav-link nav-virtual-reality" href="/virtual-reality">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="12px" viewBox="0 0 42 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -124,7 +124,7 @@
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>
             </li>
-            <li class="nav-item" onclick="clickAside('nav-profile');">
+            <li class="nav-item">
                 <a class="nav-link nav-profile" href="/profile">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="12px" viewBox="0 0 46 42" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -148,8 +148,8 @@
                     <span class="nav-link-text ms-1">Profile</span>
                 </a>
             </li>
-            <li class="nav-item" onclick="clickAside('nav-sign-in');">
-                <a class="nav-link nav-sign-in" href="/pages/sign-in.php">
+            <li class="nav-item">
+                <a class="nav-link nav-sign-in" href="/sign-in">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="12px" viewBox="0 0 40 44" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                             <title>document</title>
@@ -170,8 +170,8 @@
                     <span class="nav-link-text ms-1">Sign In</span>
                 </a>
             </li>
-            <li class="nav-item" onclick="clickAside('nav-sign-up');">
-                <a class="nav-link nav-sign-up" href="/pages/sign-up.php">
+            <li class="nav-item" >
+                <a class="nav-link nav-sign-up" href="/sign-up">
                     <div class="icon icon-shape icon-sm shadow border-radius-md bg-white text-center me-2 d-flex align-items-center justify-content-center">
                         <svg width="12px" height="20px" viewBox="0 0 40 40" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                             <title>spaceship</title>
@@ -201,8 +201,12 @@
 </aside>
 
 <script type="text/javascript">
-    function clickAside(nav) {
-        document.getElementsByClassName("active")[0].classList.remove("active");
-        document.getElementsByClassName(nav)[0].classList.add("active");
+    let pathname = document.location.pathname;
+    if (pathname.length == 1) {
+        pathname = pathname.replace("/", "nav-home");
     }
+    if (pathname.length > 1) {
+        pathname = pathname.replace("/", "nav-");
+    }
+    document.getElementsByClassName(pathname)[0].classList.add("active");
 </script>

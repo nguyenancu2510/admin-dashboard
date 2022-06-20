@@ -1,78 +1,139 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="./assets/img/favicon.png">
-    <title>
-        Soft UI Dashboard by Creative Tim
-    </title>
-    <!--     Fonts and icons     -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-    <!-- Nucleo Icons -->
-    <link href="./assets/css/nucleo-icons.css" rel="stylesheet" />
-    <link href="./assets/css/nucleo-svg.css" rel="stylesheet" />
-    <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <link href="./assets/css/nucleo-svg.css" rel="stylesheet" />
-    <!-- CSS Files -->
-    <link id="pagestyle" href="./assets/css/soft-ui-dashboard.css?v=1.0.6" rel="stylesheet" />
-</head>
+class Route {
 
-<body class="g-sidenav-show  bg-gray-100">
-    <?php
-    require __DIR__ . '/pages/component/aside.php';
+    private function simpleRoute($file, $route){
+        //replacing first and last forward slashes
+        //$_SERVER['REQUEST_URI'] will be empty if req uri is /
 
-    $request = $_SERVER['REQUEST_URI'];
-    switch ($request) {
-        case '/':
-            require __DIR__ . '/pages/dashboard.php';
-            // include('/pages/dashboard.php');
-            break;
-        case '/category':
-            require __DIR__ . '/pages/category.php';
-            break;
-        case '/tables':
-            require __DIR__ . '/pages/tables.php';
-            break;
-        case '/billing':
-            require __DIR__ . '/pages/billing.php';
-            break;
-        case '/virtual-reality':
-            require __DIR__ . '/pages/virtual-reality.php';
-            break;
-        case '/profile':
-            require __DIR__ . '/pages/profile.php';
-            break;
-        default:
-            http_response_code(404);
-            require __DIR__ . '/pages/404.php';
-            break;
-    }
-    require __DIR__ . '/pages/component/setting-theme.php';
-    ?>
-    <!--   Core JS Files   -->
-    <script src="./assets/js/core/popper.min.js"></script>
-    <script src="./assets/js/core/bootstrap.min.js"></script>
-    <script src="./assets/js/plugins/perfect-scrollbar.min.js"></script>
-    <script src="./assets/js/plugins/smooth-scrollbar.min.js"></script>
-    <script src="./assets/js/plugins/chartjs.min.js"></script>
-
-    <script>
-        var win = navigator.platform.indexOf('Win') > -1;
-        if (win && document.querySelector('#sidenav-scrollbar')) {
-            var options = {
-                damping: '0.5'
-            }
-            Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+        if(!empty($_SERVER['REQUEST_URI'])){
+            $route = preg_replace("/(^\/)|(\/$)/","",$route);
+            $reqUri =  preg_replace("/(^\/)|(\/$)/","",$_SERVER['REQUEST_URI']);
+        }else{
+            $reqUri = "/";
         }
-    </script>
-    <!-- Github buttons -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
-    <script src="./assets/js/soft-ui-dashboard.min.js?v=1.0.6"></script>
-</body>
 
-</html>
+        if($reqUri == $route){
+            $params = [];
+            include($file);
+            exit();
+
+        }
+    }
+
+    function add($route,$file){
+        
+
+        //will store all the parameters value in this array
+        $params = [];
+
+        //will store all the parameters names in this array
+        $paramKey = [];
+
+        //finding if there is any {?} parameter in $route
+        preg_match_all("/(?<={).+?(?=})/", $route, $paramMatches);
+
+        //if the route does not contain any param call simpleRoute();
+        if(empty($paramMatches[0])){
+            $this->simpleRoute($file,$route);
+            return;
+        }
+
+        //setting parameters names
+        foreach($paramMatches[0] as $key){
+            $paramKey[] = $key;
+        }
+
+        //replacing first and last slashes
+        //$_SERVER['REQUEST_URI'] will be empty if req uri is /
+        if(!empty($_SERVER['REQUEST_URI'])){
+            $route = preg_replace("/(^\/)|(\/$)/","",$route);
+            $reqUri =  preg_replace("/(^\/)|(\/$)/","",$_SERVER['REQUEST_URI']);
+        }else{
+            $reqUri = "/";
+        }
+
+        //exploding route address
+        $uri = explode("/", $route);
+
+        //will store index number where {?} parameter is required in the $route 
+        $indexNum = []; 
+
+        //storing index number, where {?} parameter is required with the help of regex
+        foreach($uri as $index => $param){
+            if(preg_match("/{.*}/", $param)){
+                $indexNum[] = $index;
+            }
+        }
+
+        //exploding request uri string to array to get
+        //the exact index number value of parameter from $_SERVER['REQUEST_URI']
+        $reqUri = explode("/", $reqUri);
+
+        //running for each loop to set the exact index number with reg expression
+        //this will help in matching route
+        foreach($indexNum as $key => $index){
+        
+             //in case if req uri with param index is empty then return
+            //because url is not valid for this route
+            if(empty($reqUri[$index])){
+                return;
+            }
+            
+            //setting params with params names
+            $params[$paramKey[$key]] = $reqUri[$index];
+
+
+            //this is to create a regex for comparing route address
+            $reqUri[$index] = "{.*}";
+        }
+
+        //converting array to sting
+        $reqUri = implode("/",$reqUri);
+
+        //replace all / with \/ for reg expression
+        //regex to match route is ready !
+        $reqUri = str_replace("/", '\\/', $reqUri);
+
+        //now matching route with regex
+        if(preg_match("/$reqUri/", $route))
+        {
+            include($file);
+            exit();
+
+        }
+    }
+
+    function notFound($file){
+        include($file);
+        exit();
+    }
+}
+// //Route instance
+$route = new Route();
+
+// //Example
+// $route->add("ROUTE ADDRESS","PHP FILE LOCATION FOR THIS ROUTE");
+
+// //without parameter
+$route->add("/", "pages/dashboard.php");
+$route->add("/category","pages/category.php");
+$route->add("/tables","pages/tables.php");
+$route->add("/billing","pages/billing.php");
+$route->add("/virtual-reality","pages/virtual-reality.php");
+$route->add("/profile","pages/profile.php");
+$route->add("/sign-in","pages/sign-in.php");
+$route->add("/sign-up","pages/sign-up.php");
+
+// //with parameter
+// $route->add("/user/{id}","user.php");
+
+// //in user.php access id like this :
+// $params['id'];
+
+// //At the last of index.php file call notFound() method of Route for 404 error.
+// $route->notFound("404 PAGE LOCATION");
+
+$route->notFound("pages/404.php");
+
+?>
